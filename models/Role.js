@@ -1,4 +1,4 @@
-var mongoose = require("mongoose"),
+var mongoose = require('mongoose'),
     Schema = mongoose.Schema;
 
 var RoleSchema = new mongoose.Schema({
@@ -12,12 +12,10 @@ var RoleSchema = new mongoose.Schema({
     }]
 });
 
-var Role = mongoose.model('Role', RoleSchema);
-
 // include and attach the JSON plugin
 var toJson = require('../mongoose/plugins/json');
-
 RoleSchema.plugin(toJson.plugin);
 
+var Role = mongoose.model('Role', RoleSchema);
+
 module.exports = Role;
-//module.exports = RoleSchema;

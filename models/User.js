@@ -1,4 +1,4 @@
-var mongoose = require("mongoose"),
+var mongoose = require('mongoose'),
     Schema = mongoose.Schema;
 
 var UserSchema = new mongoose.Schema({
@@ -28,7 +28,6 @@ var UserSchema = new mongoose.Schema({
         required: 'user.validation.error.password.required'
     },
     roles: [{
-        //type: Schema.ObjectId,
         type: Schema.Types.ObjectId,
         ref: 'Role'
     }],
@@ -60,5 +59,7 @@ UserSchema.options.toJSON = {
         return ret;
     }
 };
+
+var User = mongoose.model('User', UserSchema);
 
 module.exports = User;

@@ -45,6 +45,18 @@ router.post('/', function (req, res, next) {
 
 });
 
+/* GET /users/:id */
+router.get('/:id', function (req, res, next) {
+    // TODO exclude roles from selection
+    //User.findById(req.params.id).populate({path: 'roles'}).exec(function (err, role) {
+    User.findById(req.params.id, function (err, role) {
+        if (err) {
+            return next(err);
+        }
+        res.json(role);
+    });
+});
+
 /* DELETE /users/:id */
 router.delete('/:id', function (req, res, next) {
     User.findByIdAndRemove(req.params.id, req.body, function (err, user) {
