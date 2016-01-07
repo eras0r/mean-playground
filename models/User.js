@@ -6,23 +6,18 @@ var UserSchema = new mongoose.Schema({
         type: String,
         required: 'user.validation.error.username.required'
     },
-    // TODO exclude from json
     algorithm: {
         type: String,
-        required: 'user.validation.error.algorithm.required',
-        hide: true
+        required: 'user.validation.error.algorithm.required'
     },
-    // TODO exclude from json
     iterations: {
         type: Number,
         required: 'user.validation.error.iterations.required'
     },
-    // TODO exclude from json
     salt: {
         type: String,
         required: 'user.validation.error.salt.required'
     },
-    // TODO exclude from json
     password: {
         type: String,
         required: 'user.validation.error.password.required'
