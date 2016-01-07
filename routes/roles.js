@@ -7,6 +7,10 @@ var User = require('../models/User');
 
 /* GET /roles */
 router.get('/', function (req, res, next) {
+    // deselect a property (referenced collection 'users' in this case)
+    // Role.find({}, '-users').exec(function (err, roles) {
+
+    // populate collection 'users'
     Role.find({}).populate('users').exec(function (err, roles) {
         if (err) {
             return next(err);
@@ -28,11 +32,16 @@ router.post('/', function (req, res, next) {
     });
 });
 
-/* GET /roles/:id/users (get the usersfor a given role */
+/* GET /roles/:id/users (get the users for a given role */
 router.get('/:id/users', function (req, res, next) {
-    // TODO exclude users from selection
-    //User.find({roles: req.params.id}).populate({path: 'roles', select: '-users'}).exec(function (err, roles) {
-    User.find({roles: req.params.id}).populate({path: 'roles'}).exec(function (err, roles) {
+    // do not select the 'roles' collection from each user
+//    User.find({roles: req.params.id}, '-roles').exec(function (err, roles) {
+
+    // populate the 'roles' collection
+    // User.find({roles: req.params.id}).populate({path: 'roles'}).exec(function (err, roles) {
+
+    // exclude the 'users' property from a populated 'roles' collection
+    User.find({roles: req.params.id}).populate({path: 'roles', select: '-users'}).exec(function (err, roles) {
         if (err) {
             return next(err);
         }
