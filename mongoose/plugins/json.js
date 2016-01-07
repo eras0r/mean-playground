@@ -1,6 +1,6 @@
 /**
- * Transformer function for converts the given object to JSON.
- * This funtction can be reused by schemas in order to be extended.
+ * Transformer function that converts the given object to JSON.
+ * This function can be reused by schemas in order to be extended.
  * @param ret the object to be converted into JSON
  * @returns {*} the object converted into JSON
  */
