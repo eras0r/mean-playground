@@ -1,6 +1,11 @@
 var mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost/lost', function (err) {
+var options = {
+    user: 'lost',
+    pass: 'b6DNfHABKU'
+};
+
+mongoose.connect('mongodb://localhost/lost', options, function (err) {
     if (err) {
         console.log('connection error', err);
     } else {
