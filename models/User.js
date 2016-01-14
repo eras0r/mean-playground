@@ -1,5 +1,5 @@
-var mongoose = require('mongoose'),
-    Schema = mongoose.Schema;
+var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
 
 var UserSchema = new mongoose.Schema({
     username: {
@@ -32,8 +32,6 @@ var UserSchema = new mongoose.Schema({
     }
 });
 
-var User = mongoose.model('User', UserSchema);
-
 // include and attach the JSON plugin
 var toJson = require('../mongoose/plugins/json');
 
@@ -54,6 +52,10 @@ UserSchema.options.toJSON = {
         return ret;
     }
 };
+
+// register error handling plugin
+var errorHandling = require('../mongoose/plugins/error-handling');
+UserSchema.plugin(errorHandling.plugin);
 
 var User = mongoose.model('User', UserSchema);
 

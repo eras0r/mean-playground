@@ -1,5 +1,5 @@
-var mongoose = require('mongoose'),
-    Schema = mongoose.Schema;
+var mongoose = require('mongoose')
+var Schema = mongoose.Schema;
 
 var RoleSchema = new mongoose.Schema({
     rolename: {
@@ -15,6 +15,10 @@ var RoleSchema = new mongoose.Schema({
 // include and attach the JSON plugin
 var toJson = require('../mongoose/plugins/json');
 RoleSchema.plugin(toJson.plugin);
+
+// register error handling plugin
+var errorHandling = require('../mongoose/plugins/error-handling');
+RoleSchema.plugin(errorHandling.plugin);
 
 var Role = mongoose.model('Role', RoleSchema);
 
