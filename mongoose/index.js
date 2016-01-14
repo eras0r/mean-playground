@@ -1,5 +1,8 @@
 var mongoose = require('mongoose');
 
+// set promise provider to bluebird
+mongoose.Promise = require('bluebird');
+
 var options = {
     user: 'lost',
     pass: 'b6DNfHABKU'
