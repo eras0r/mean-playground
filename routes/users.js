@@ -6,6 +6,8 @@ var _ = require('lodash');
 var User = require('../models/User');
 var Role = require('../models/Role');
 
+var errorHandling = require('../mongoose/plugins/error-handling');
+
 /* GET /users listing. */
 router.get('/', function (req, res, next) {
     // exclude roles.users from selection
@@ -20,28 +22,92 @@ router.get('/', function (req, res, next) {
 
 /* POST /users (bi directional linking between users and roles) */
 router.post('/', function (req, res, next) {
-    User.create(req.body, function (err, user) {
-        if (err) {
-            return next(err);
-        }
 
-        _.forEach(req.body.roles, function (roleId) {
-            Role.findById(roleId, function (err, role) {
-                console.log('role = ', role);
-                if (err) {
-                    return next(err);
-                }
+    var user = req.body;
 
-                // add the newly created user to the role.users list for bidirectional linking
-                role.users.push(user);
-                role.save();
+    // load all roles and check if they exist
+    // non existing roles will not be added to the user's roles
+    var rolePromises = [];
+    _.forEach(user.roles, function (roleId) {
+        console.log('finding role with id ', roleId);
+
+        console.log('roleId ', roleId);
+        console.log('roleId typeof ', typeof roleId);
+
+        var rolePromise = Role.findById(roleId).exec();
+        rolePromises.push(rolePromise);
+
+        rolePromise
+            .then(function (role) {
+                console.log('role with id = "' + roleId + '" has been found and will be added to the users roles');
+            })
+            .catch(function (err) {
+                console.log('role with id = "' + roleId + '" was not found and was not added to the users roles.');
+                console.log('err ', err);
+
+                console.log('user.roles before removal: ', user.roles);
+                // remove the non exsiting role from the user's roles
+                _.remove(user.roles, function (role) {
+                    return role.toString() === roleId.toString();
+                });
+                console.log('user.roles after removal: ', user.roles);
             });
-        });
-
-        res.status(201);
-        res.location('/users/' + user._id);
-        res.json(user);
     });
+
+    // wait for multiple promises and ignore rejected promises.
+    // see http://stackoverflow.com/a/30310336
+    Promise.all(rolePromises.map(function (el) {
+            return el.reflect();
+        }))
+        // TODO this seems not to work in node
+        //.filter(function (p) {
+        //    console.log('---filter');
+        //    return p.isFulfilled();
+        //})
+        .then(function (results) {
+
+            var arr = ['a', 'b'];
+            console.log('typoeof [] = ', typeof arr);
+            _.forEach(arr, function (item, idx) {
+                console.log('idx: ' + idx + '=' + item);
+            });
+
+            console.log('typoeof [] = ', typeof results);
+            _.forEach(results, function (item, idx) {
+                console.log('idx: ' + idx + '=' + item);
+            });
+
+            User.create(user)
+                .then(function (createdUser) {
+                    // iterate over promises
+
+                    _.forEach(results, function (promise) {
+                        console.log('promise: ', promise);
+                        var fulFilled = promise.isFulfilled();
+                        console.log('fulfilled? = ', fulFilled);
+                        if (fulFilled) {
+                            var role = promise.value();
+                            console.log('role = ', role);
+
+                            console.log('role:', role);
+                            console.log('--------------------------------------');
+                            // add the user to the role's user's for bidirectional linking
+                            role.users.push(createdUser);
+                            role.save();
+                        }
+                    });
+
+                    res.status(201);
+                    res.location('/users/' + createdUser._id);
+                    res.json(createdUser);
+                })
+                .catch(function (err) {
+                    console.log('error creating new user', err);
+                    return next(err);
+                });
+
+
+        });
 
 });
 
@@ -49,69 +115,13 @@ router.post('/', function (req, res, next) {
 router.get('/:id', function (req, res, next) {
     // TODO exclude roles from selection
     //User.findById(req.params.id).populate({path: 'roles'}).exec(function (err, role) {
-    User.findById(req.params.id, function (err, role) {
-        if (err) {
-            return next(err);
-        }
-        res.json(role);
-    });
-});
-
-/* POST /users/:id/roles */
-/**
- * Adds a new role to the given user.
- */
-router.post('/:id/roles', function (req, res, next) {
-    User.findById(req.params.id, function (err, user) {
-        if (err) {
-            next(err);
-        }
-
-        console.log('current user roles: ' + user.roles);
-        console.log('request body: ' + req.body);
-        console.log('new roles: ' + req.body.roles);
-
-        // contains a promise for each role to be retrieved
-        var rolePromises = [];
-
-
-        // iterate over the roles to be added
-        _.forEach(req.body.roles, function (roleId) {
-            console.log('role ' + roleId + ' will be added');
-            console.log('checking if role ' + roleId + ' exists...');
-
-            var rolePromise = Role.findById(roleId).exec();
-            console.log('rolePromise: ', rolePromise);
-            rolePromises.push(rolePromise);
-
-            // TODO avoid adding roles which are already present
-
-            // check if the role exists
-            rolePromise
-                .then(function (role) {
-                    console.log('found role = ', role);
-
-                    // add the newly created user to the role.users list for bidirectional linking
-                    user.roles.push(role);
-                });
-                // TODO define alternative promise provider for mongoose, see http://eddywashere.com/blog/switching-out-callbacks-with-promises-in-mongoose/
-                //.catch(function (err) {
-                //    console.log('error finding role with id ' + roleId + ' role will not be added!');
-                //    //console.log(err);
-                //});
+    User.findById(req.params.id).populate({path: 'roles', select: '-users'}).exec()
+        .then(function (user) {
+            res.json(user);
+        })
+        .catch(function (err) {
+            errorHandling.handleNotFoundError(err, res, next);
         });
-
-        // wait for all role calls to be completed
-        Promise.all(rolePromises).then(function () {
-            console.log('all roles loaded');
-            console.log('saving user now...');
-            user.save();
-            console.log('user has been updated successfully with roles');
-        });
-
-        res.json();
-    });
-
 });
 
 /* DELETE /users/:id */

@@ -17,6 +17,7 @@ var routes = require('./routes/index');
 
 var roles = require('./routes/roles');
 var users = require('./routes/users');
+var usersRoles = require('./routes/user-roles');
 var characters = require('./routes/characters');
 
 
@@ -56,6 +57,7 @@ app.use(function (req, res, next) {
 app.use('/', routes);
 app.use('/roles', roles);
 app.use('/users', users);
+app.use('/users', usersRoles);
 app.use('/characters', characters);
 
 // catch 404 and forward to error handler
@@ -107,6 +109,7 @@ function convertValidationError(validationError) {
 // will print stacktrace
 if (app.get('env') === 'development') {
     app.use(function (err, req, res, next) {
+        console.log('error', err);
         console.log('dev error handler, err.name = ', err.name);
         res.status(err.status || 500);
         res.render('error', {
