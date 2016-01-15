@@ -3,8 +3,8 @@ var router = express.Router();
 
 var _ = require('lodash');
 
-var User = require('../models/User');
-var Role = require('../models/Role');
+var User = require('../models/user');
+var Role = require('../models/role');
 
 /**
  * List a user's roles.
