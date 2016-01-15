@@ -5,7 +5,10 @@ mongoose.Promise = require('bluebird');
 
 var options = {
   user: 'lost',
-  pass: 'b6DNfHABKU'
+  pass: 'b6DNfHABKU',
+  auth: {
+    authdb: 'lost'
+  }
 };
 
 mongoose.connect('mongodb://localhost/lost', options, function (err) {
