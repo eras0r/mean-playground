@@ -8,14 +8,14 @@ var documentNotFoundError = 'Document not found';
  * Handles the not found error.
  */
 module.exports.handleNotFoundError = function handleNotFoundError(err, res, next) {
-    if (err.message === documentNotFoundError) {
-        res.status(404);
-        res.end();
-    }
-    else {
-        // pass all other errors
-        next(err);
-    }
+  if (err.message === documentNotFoundError) {
+    res.status(404);
+    res.end();
+  }
+  else {
+    // pass all other errors
+    next(err);
+  }
 };
 
 /**
@@ -24,14 +24,14 @@ module.exports.handleNotFoundError = function handleNotFoundError(err, res, next
  */
 module.exports.plugin = function plugin(schema) {
 
-    /**
-     * Post handle for findOne(). Will also be troggered for findById().
-     */
-    schema.post('findOne', function (res, next) {
-        if (!res) {
-            return next(new Error(documentNotFoundError));
-        }
-        return next();
-    });
+  /**
+   * Post handle for findOne(). Will also be troggered for findById().
+   */
+  schema.post('findOne', function (res, next) {
+    if (!res) {
+      return next(new Error(documentNotFoundError));
+    }
+    return next();
+  });
 
 };

@@ -4,14 +4,14 @@ var mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');
 
 var options = {
-    user: 'lost',
-    pass: 'b6DNfHABKU'
+  user: 'lost',
+  pass: 'b6DNfHABKU'
 };
 
 mongoose.connect('mongodb://localhost/lost', options, function (err) {
-    if (err) {
-        console.log('connection error', err);
-    } else {
-        console.log('connection successful');
-    }
+  if (err) {
+    console.log('connection error', err);
+  } else {
+    console.log('connection successful');
+  }
 });

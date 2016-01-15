@@ -47,11 +47,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // custom global handler for all requests
 app.use(function (req, res, next) {
-    // set some HTTP header
-    debug('setting powered by header');
-    res.set('X-Powered-By', 'Hello World REST API');
+  // set some HTTP header
+  debug('setting powered by header');
+  res.set('X-Powered-By', 'Hello World REST API');
 
-    next();
+  next();
 });
 
 app.use('/', routes);
@@ -62,29 +62,29 @@ app.use('/characters', characters);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-    console.log('404 error handler');
-    var err = new Error('Not Found');
-    err.status = 404;
-    next(err); // any argument in next() other than 'route' will be treated as error
+  console.log('404 error handler');
+  var err = new Error('Not Found');
+  err.status = 404;
+  next(err); // any argument in next() other than 'route' will be treated as error
 
-    // this would just send a 404 response without any further processing
-    //res.status(404).end();
+  // this would just send a 404 response without any further processing
+  //res.status(404).end();
 });
 
 // error handlers
 
 // generic mongoose error handler
 app.use(function (err, req, res, next) {
-    // handle mongoose validation errors
-    if (err.name === 'ValidationError') {
-        res.status(422);
-        //res.json(err);
-        res.json(convertValidationError(err));
-    }
-    else {
-        // call the next error handler for all other errors
-        next(err);
-    }
+  // handle mongoose validation errors
+  if (err.name === 'ValidationError') {
+    res.status(422);
+    //res.json(err);
+    res.json(convertValidationError(err));
+  }
+  else {
+    // call the next error handler for all other errors
+    next(err);
+  }
 });
 
 /**
@@ -93,41 +93,41 @@ app.use(function (err, req, res, next) {
  * @returns {{}} the converted validation error
  */
 function convertValidationError(validationError) {
-    var convertedErr = {};
+  var convertedErr = {};
 
-    convertedErr.message = validationError.message;
-    convertedErr.errors = {};
+  convertedErr.message = validationError.message;
+  convertedErr.errors = {};
 
-    _.forOwn(validationError.errors, function (val, key) {
-        convertedErr.errors[key] = _.pick(val, ['kind', 'path', 'message']);
-    });
+  _.forOwn(validationError.errors, function (val, key) {
+    convertedErr.errors[key] = _.pick(val, ['kind', 'path', 'message']);
+  });
 
-    return convertedErr;
+  return convertedErr;
 }
 
 // development error handler (notice the 4 arguments)
 // will print stacktrace
 if (app.get('env') === 'development') {
-    app.use(function (err, req, res, next) {
-        console.log('error', err);
-        console.log('dev error handler, err.name = ', err.name);
-        res.status(err.status || 500);
-        res.render('error', {
-            message: err.message,
-            error: err
-        });
+  app.use(function (err, req, res, next) {
+    console.log('error', err);
+    console.log('dev error handler, err.name = ', err.name);
+    res.status(err.status || 500);
+    res.render('error', {
+      message: err.message,
+      error: err
     });
+  });
 }
 
 // production error handler (notice the 4 arguments)
 // no stacktraces leaked to user
 app.use(function (err, req, res, next) {
-    console.log('non-dev error handler, err.name = ', err.name);
-    res.status(err.status || 500);
-    res.render('error', {
-        message: err.message,
-        error: {}
-    });
+  console.log('non-dev error handler, err.name = ', err.name);
+  res.status(err.status || 500);
+  res.render('error', {
+    message: err.message,
+    error: {}
+  });
 });
 
 module.exports = app;

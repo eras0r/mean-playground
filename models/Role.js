@@ -2,14 +2,14 @@ var mongoose = require('mongoose')
 var Schema = mongoose.Schema;
 
 var RoleSchema = new mongoose.Schema({
-    rolename: {
-        type: String,
-        required: 'role.validation.error.rolename.required'
-    },
-    users: [{
-        type: Schema.Types.ObjectId,
-        ref: 'User'
-    }]
+  rolename: {
+    type: String,
+    required: 'role.validation.error.rolename.required'
+  },
+  users: [{
+    type: Schema.Types.ObjectId,
+    ref: 'User'
+  }]
 });
 
 // include and attach the JSON plugin
