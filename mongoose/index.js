@@ -1,7 +1,10 @@
 var mongoose = require('mongoose');
+var log = require('../lib/logger');
 
 // set promise provider to bluebird
 mongoose.Promise = require('bluebird');
+
+var databaseUrl = 'mongodb://localhost/lost';
 
 var options = {
   user: 'lost',
@@ -11,10 +14,10 @@ var options = {
   }
 };
 
-mongoose.connect('mongodb://localhost/lost', options, function (err) {
+mongoose.connect(databaseUrl, options, function (err) {
   if (err) {
-    console.log('connection error', err);
+    log.error('Error connecting to database "' + databaseUrl + '"', err);
   } else {
-    console.log('connection successful');
+    log.info('Successfully connected to database "' + databaseUrl + '"');
   }
 });

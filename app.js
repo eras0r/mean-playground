@@ -1,7 +1,8 @@
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
-var logger = require('morgan');
+var morganLogger = require('morgan');
+
 var debug = require('debug')('helloWorld:app');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
@@ -11,18 +12,19 @@ var compression = require('compression');
 
 var _ = require('lodash');
 
-// own scripts
+// libs
+var log = require('./lib/logger');
 var db = require('./mongoose');
-var routes = require('./routes/index');
 
+// routes
+// TODO check if we need the root route
+var routes = require('./routes/index');
 var roles = require('./routes/roles');
 var users = require('./routes/users');
 var usersRoles = require('./routes/user-roles');
 var characters = require('./routes/characters');
 
-
 var app = express();
-
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -37,7 +39,7 @@ app.set('json spaces', 2);
 // enable gzip compression
 app.use(compression());
 
-app.use(logger('dev'));
+app.use(morganLogger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
@@ -62,7 +64,7 @@ app.use('/characters', characters);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-  console.log('404 error handler');
+  log.error('404 error handler');
   var err = new Error('Not Found');
   err.status = 404;
   next(err); // any argument in next() other than 'route' will be treated as error
@@ -109,8 +111,8 @@ function convertValidationError(validationError) {
 // will print stacktrace
 if (app.get('env') === 'development') {
   app.use(function (err, req, res, next) {
-    console.log('error', err);
-    console.log('dev error handler, err.name = ', err.name);
+    log.error('error', err);
+    log.error('dev error handler, err.name = ', err.name);
     res.status(err.status || 500);
     res.render('error', {
       message: err.message,
@@ -122,7 +124,7 @@ if (app.get('env') === 'development') {
 // production error handler (notice the 4 arguments)
 // no stacktraces leaked to user
 app.use(function (err, req, res, next) {
-  console.log('non-dev error handler, err.name = ', err.name);
+  log.error('non-dev error handler, err.name = ', err.name);
   res.status(err.status || 500);
   res.render('error', {
     message: err.message,

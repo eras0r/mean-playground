@@ -68,7 +68,6 @@ router.put('/:id', function (req, res, next) {
   //    if (err) {
   //        return next(err);
   //    }
-  //    console.log(character);
   //    res.json(character);
   //});
 });

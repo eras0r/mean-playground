@@ -1,7 +1,9 @@
 var express = require('express');
 var router = express.Router();
-
 var _ = require('lodash');
+
+var log = require('../lib/logger');
+var errorHandling = require('../mongoose/plugins/error-handling');
 
 var User = require('../models/user');
 var Role = require('../models/role');
@@ -23,8 +25,8 @@ router.post('/:id/roles', function (req, res, next) {
     .then(function (user) {
       var newRoleId = req.body.roleId;
 
-      console.log('current user roles: ' + user.roles);
-      console.log('new roleId: ' + newRoleId);
+      log.debug('current user roles: ' + user.roles);
+      log.debug('new roleId: ' + newRoleId);
 
       // find role
       Role.findById(newRoleId).exec()
@@ -34,7 +36,7 @@ router.post('/:id/roles', function (req, res, next) {
 
             // TODO find a better way the the toString comparison below
             if (persistentRole.toString() === role._id.toString()) {
-              console.log('Role ignored, because the user already has the given role: ', role);
+              log.warn('Role ignored, because the user already has the given role: ', role);
               userAlreadyHasRole = true;
               // break the forEach loop
               return false;
@@ -46,12 +48,12 @@ router.post('/:id/roles', function (req, res, next) {
             user.roles.push(role);
 
             // save the user
-            console.log('saving user now...');
+            log.info('saving user now...');
             user.save()
               .then(function (savedUser) {
+                log.info('role %s has been added to user %s', role, user);
                 res.json(savedUser.roles);
               });
-            console.log('user has been updated successfully with roles');
           }
           else {
             // TODO maybe use other error code
@@ -60,14 +62,11 @@ router.post('/:id/roles', function (req, res, next) {
           }
         })
         .catch(function (err) {
-          console.log('Skipping role with id=' + newRoleId + ', because it was not found in the roles collection!');
-          console.log(err);
+          errorHandling.handleNotFoundError(err, res, next);
         });
     })
     .catch(function (err) {
-      if (err) {
-        next(err);
-      }
+      errorHandling.handleNotFoundError(err, res, next);
     });
 
 });
